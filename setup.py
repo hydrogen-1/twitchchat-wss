@@ -4,7 +4,7 @@ with open("README.md", "r") as readme:
     long_description = readme.read()
 
 setup(
-    version="0.0.2",
+    version="0.0.3",
     name="twitchchat-wss",
     long_description=long_description,
     long_description_content_type="text/markdown",
