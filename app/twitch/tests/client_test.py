@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import MagicMock, call
-from twitch import TwitchChatClient
+from app.twitch import TwitchChatClient
 
 
 class TestTwitchChatClient(unittest.TestCase):
@@ -21,7 +21,7 @@ class TestTwitchChatClient(unittest.TestCase):
             call("JOIN #mock_channel"),
             call("JOIN #mock_channel_1"),
         ]
-        self.mock_wsapp.send.assert_has_calls([call for call in expected_calls])
+        self.mock_wsapp.send.assert_has_calls(expected_calls)
         self.assertTrue(self.twitch_client.connected)
         self.twitch_client.stop()
 
@@ -35,7 +35,7 @@ class TestTwitchChatClient(unittest.TestCase):
             call("JOIN #mock_channel_1"),
             call("JOIN #new_channel"),
         ]
-        self.mock_wsapp.send.assert_has_calls([call for call in expected_calls])
+        self.mock_wsapp.send.assert_has_calls(expected_calls)
         self.assertTrue(self.twitch_client.connected)
         self.twitch_client.stop()
 
@@ -57,7 +57,7 @@ class TestTwitchChatClient(unittest.TestCase):
             call("JOIN #mock_channel_1"),
             call("PONG :tmi.twitch.tv"),
         ]
-        self.mock_wsapp.send.assert_has_calls([call for call in expected_calls])
+        self.mock_wsapp.send.assert_has_calls(expected_calls)
         self.assertTrue(self.twitch_client.connected)
         self.twitch_client.stop()
 
