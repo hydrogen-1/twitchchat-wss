@@ -1,4 +1,4 @@
-from .src.client import (
+from .client import (
     Credentials,
     TwitchChatClient,
     Message

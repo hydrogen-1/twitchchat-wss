@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import MagicMock, call
-from app.twitch import TwitchChatClient
+from app.twitchchat_wss import TwitchChatClient
 
 
 class TestTwitchChatClient(unittest.TestCase):
