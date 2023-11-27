@@ -38,16 +38,16 @@ class TwitchChatClient:
         )
         self.thread: threading.Thread | None = None
         self.channels = channels
+        self.command_queue = Queue()
 
     def on_open(self, wa: WebSocketApp) -> None:
         wa.send(f"PASS {self.credentials.oauth_token}")
         wa.send(f"NICK {self.credentials.user_name}")
         for channel in self.channels:
             wa.send(f"JOIN #{channel}")
-        self.lock.acquire()
+        while not self.command_queue.empty():
+            wa.send(self.command_queue.get())
         self.connected = True
-        self.cv_connected.notify_all()
-        self.lock.release()
 
     def on_message(self, wa: WebSocketApp, msg: str) -> None:
         if msg.startswith("PING"):
@@ -81,17 +81,23 @@ class TwitchChatClient:
         self.thread = threading.Thread(target=self.wsapp.run_forever)
         self.thread.start()
 
+    def send_command(self, command: str):
+        if not self.connected:
+            self.command_queue.put(command)
+        else:
+            self.wsapp.send(command)
+
     def join_channel(self, channel_name: str) -> None:
-        self.lock.acquire()
-        while not self.connected:
-            self.cv_connected.wait()
-        self.lock.release()
-        self.wsapp.send(f"JOIN #{channel_name}")
+        self.send_command(f"JOIN #{channel_name}")
+
+    def send_message(self, message: Message):
+        self.send_command(f"PRIVMSG #{message.channel} :{message.text}")
 
     def stop(self) -> None:
         if self.thread is not None:
             self.message_queue.put(None)
             self.error_queue.put(None)
+            self.command_queue.put(None)
             self.closing = True
             self.wsapp.close()
             self.thread.join()
